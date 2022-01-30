@@ -2,14 +2,12 @@ import { db } from "../db/connection";
 
 export const dbAccess = {
   findOne: async (table, fieldPair) => {
-    return await db
-      .select("*")
-      .from(table)
-      .where(fieldPair.field, fieldPair.value)
-      .first();
+    return await db.select("*").from(table).where(fieldPair).first();
   },
-  findAll: async (table) => {
-    return await db.select("*").from(table);
+  findAll: async (table, fieldPair = null) => {
+    return fieldPair
+      ? await db.select("*").from(table).where(fieldPair)
+      : await db.select("*").from(table);
   },
   insertOne: async (table, object) => {
     try {

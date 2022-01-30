@@ -4,6 +4,11 @@ export const channelTypeDefs = gql`
   type Query {
     getChannel(id: String!): Channel!
     getAllChannels: [Channel]!
+    getAllJoinedChannels: [Channel]!
+  }
+
+  type Mutation {
+    createChannel(name: String!, description: String!): ChannelResult
   }
 
   type Channel {
@@ -11,4 +16,10 @@ export const channelTypeDefs = gql`
     name: String
     description: String
   }
+
+  type Errors {
+    message: String!
+  }
+
+  union ChannelResult = Channel | Errors
 `;

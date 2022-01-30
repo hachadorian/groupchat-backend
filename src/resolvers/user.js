@@ -11,8 +11,7 @@ export const userResolver = {
     hello: () => "hello",
     me: async (root, args, context) => {
       const user = await dbAccess.findOne("user", {
-        field: "id",
-        value: context.req.session.qid,
+        id: context.req.session.qid,
       });
       return user;
     },
@@ -48,8 +47,7 @@ export const userResolver = {
     },
     login: async (root, args, context) => {
       const user = await dbAccess.findOne("user", {
-        field: "email",
-        value: args.email,
+        email: args.email,
       });
 
       if (!user) {
@@ -76,8 +74,7 @@ export const userResolver = {
     },
     update: async (root, args, context) => {
       const user = await dbAccess.findOne("user", {
-        field: "id",
-        value: context.req.session.qid,
+        id: context.req.session.qid,
       });
 
       const errors = validate({
@@ -134,11 +131,7 @@ export const userResolver = {
       );
     },
     forgotPassword: async (root, args, context) => {
-      dotenv.config();
-      const user = await dbAccess.findOne("user", {
-        field: "email",
-        value: args.email,
-      });
+      const user = await dbAccess.findOne("user", { email: args.email });
 
       if (!user) {
         return true;
@@ -178,8 +171,7 @@ export const userResolver = {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const user = await dbAccess.findOne("user", {
-        field: "id",
-        value: userid,
+        id: userid,
       });
 
       const hashedPassword = await bcrypt.hash(args.password, 10);
