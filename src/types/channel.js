@@ -12,9 +12,22 @@ export const channelTypeDefs = gql`
   }
 
   type Channel {
-    id: String
+    id: String!
+    name: String!
+    description: String!
+    member_count: Int
+    is_member: Boolean
+    members: [Member]
+    messages: [Message]
+  }
+
+  type Message {
+    id: String!
+    channel_id: String!
+    user_id: String!
     name: String
-    description: String
+    message: String!
+    created_at: String!
   }
 
   type Errors {

@@ -13,6 +13,8 @@ export const memberTypeDefs = gql`
     id: String!
     channel_id: String!
     user_id: String!
+    name: String
+    image: String
     is_creator: Boolean
   }
 `;
