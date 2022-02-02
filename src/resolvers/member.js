@@ -16,7 +16,7 @@ export const memberResolver = {
       });
 
       if (isMember) {
-        return false;
+        return null;
       }
 
       const createdMember = {

@@ -4,7 +4,6 @@ import { validate } from "../utils/validate";
 import { v4 as uuid } from "uuid";
 import { uploadFile } from "../utils/awsS3Uploader";
 import { sendEmail } from "../utils/sendEmail";
-import dotenv from "dotenv";
 
 export const userResolver = {
   Query: {

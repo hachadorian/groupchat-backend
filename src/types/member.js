@@ -6,7 +6,7 @@ export const memberTypeDefs = gql`
   }
 
   type Mutation {
-    addMember(channelID: String!): Boolean
+    addMember(channelID: String!): Boolean!
   }
 
   type Member {

@@ -20,37 +20,42 @@ export const channelResolver = {
       const members = await db
         .from("member")
         .leftJoin("user", "member.user_id", "user.id")
-        .select(
-          "member.user_id",
-          "user.name",
-          "user.image",
-          "member.is_creator"
-        );
+        .select("user_id", "user.name", "user.image", "member.is_creator")
+        .where({ channel_id: args.id });
 
       const messages = await db
         .from("message")
         .leftJoin("user", "message.user_id", "user.id")
-        .select("message.user_id", "user.name", "message.created_at");
+        .select(
+          "message.id",
+          "message.user_id",
+          "user.name",
+          "user.image",
+          "message.message",
+          "message.created_at"
+        )
+        .where({ channel_id: args.id })
+        .orderBy("created_at", "asc");
 
       return hydrateChannel(channel, members, messages);
     },
     getAllChannels: async (root, args, context) => {
-      const channels = await db
-        .from("channel")
-        .leftJoin("member", "member.channel_id", "channel.id")
-        .select(
-          "channel.id",
-          "channel.name",
-          "channel.description",
-          db.raw(
-            `case when member.user_id = '${context.req.session.qid}' then true else false end is_member`
-          )
-        )
-        .count("member.channel_id as member_count")
-        .groupBy("channel.id")
-        .groupBy("member.user_id")
-        .orderBy("member_count", "desc");
-      return channels;
+      const channels =
+        await db.raw(`select channel.id, channel.name, channel.description, count(member.channel_id) as member_count,
+	      case 
+		      when member.channel_id = channel.id or member.user_id = '${context.req.session.qid}' then true
+		      else false
+	      end is_member
+        from channel
+        left join member on member.channel_id = channel.id
+        group by channel.id,
+	      case 
+		      when member.channel_id = channel.id or member.user_id = '${context.req.session.qid}' then true
+		      else false
+	      end
+        order by member_count desc
+        `);
+      return channels.rows;
     },
     getAllJoinedChannels: async (root, args, context) => {
       const channels = await db
@@ -63,8 +68,11 @@ export const channelResolver = {
   },
   Mutation: {
     createChannel: async (root, args, context) => {
-      // grab user from context and add and set as creator in members
-      const createdChannel = {
+      const user = await dbAccess.findOne("user", {
+        id: context.req.session.qid,
+      });
+
+      let createdChannel = {
         id: uuid(),
         name: args.name,
         description: args.description,
@@ -72,6 +80,23 @@ export const channelResolver = {
 
       const insert = await dbAccess.insertOne("channel", createdChannel);
       if (insert && insert.__typename !== "Errors") {
+        const creator = {
+          id: uuid(),
+          channel_id: createdChannel.id,
+          user_id: context.req.session.qid,
+          is_creator: true,
+        };
+
+        await dbAccess.insertOne("member", creator);
+
+        createdChannel = {
+          ...createdChannel,
+          members: [user],
+          is_member: true,
+          member_count: 1,
+          messages: [],
+        };
+
         return {
           __typename: "Channel",
           ...createdChannel,
