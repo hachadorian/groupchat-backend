@@ -3,8 +3,9 @@ import { gql } from "apollo-server-core";
 export const channelTypeDefs = gql`
   type Query {
     getChannel(id: String!): Channel!
-    getAllChannels: [Channel]!
+    getChannels(search: String!): [Channel]!
     getAllJoinedChannels: [Channel]!
+    getTopChannels: [Channel]!
   }
 
   type Mutation {

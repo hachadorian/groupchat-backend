@@ -3,6 +3,7 @@ import { gql } from "apollo-server-core";
 export const messageTypeDefs = gql`
   type Query {
     getAllMessages(channel_id: String!): [Message]!
+    getSomeMessages(channelID: String!, limit: Int, offset: Int): [Message]!
   }
 
   type Mutation {
@@ -21,6 +22,10 @@ export const messageTypeDefs = gql`
 
   type Errors {
     message: String!
+  }
+
+  type Subscription {
+    messageAdded: Message!
   }
 
   union MessageResult = Message | Errors
