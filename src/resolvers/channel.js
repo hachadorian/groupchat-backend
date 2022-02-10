@@ -2,16 +2,18 @@ import { dbAccess } from "../utils/dbAccess";
 import { v4 as uuid } from "uuid";
 import { db } from "../db/connection";
 
-function hydrateChannel(channel, members) {
+function hydrateChannel(channel, members, messages) {
   return {
     ...channel,
     members: members,
+    messages: messages,
   };
 }
 
 export const channelResolver = {
   Query: {
     getChannel: async (root, args, context) => {
+      const limit = 7;
       const channel = await dbAccess.findOne("channel", {
         id: args.id,
       });
@@ -22,13 +24,21 @@ export const channelResolver = {
         .select("user_id", "user.name", "user.image", "member.is_creator")
         .where({ channel_id: args.id });
 
-      return hydrateChannel(channel, members);
+      const messages = await db.raw(`
+      select message.id, message.user_id, public.user.name, public.user.image, message.message, message.created_at
+      from message
+      left join public.user on message.user_id = public.user.id
+      where channel_id = '${args.id}'
+      order by created_at desc
+      limit ${limit}`);
+
+      return hydrateChannel(channel, members, messages.rows);
     },
     getChannels: async (root, args, context) => {
       const channels =
         await db.raw(`select channel.id, channel.name, channel.description, count(member.channel_id) as member_count,
 	      case 
-		      when member.channel_id = channel.id or member.user_id = '${
+		      when member.channel_id = channel.id and member.user_id = '${
             context.req.session.qid
           }' then true
 		      else false
@@ -38,7 +48,7 @@ export const channelResolver = {
         where channel.name like '%${args.search ? args.search : ""}%'
         group by channel.id,
 	      case 
-		      when member.channel_id = channel.id or member.user_id = '${
+		      when member.channel_id = channel.id and member.user_id = '${
             context.req.session.qid
           }' then true
 		      else false
@@ -59,14 +69,14 @@ export const channelResolver = {
       const channels =
         await db.raw(`select channel.id, channel.name, channel.description, count(member.channel_id) as member_count,
 	      case 
-		      when member.channel_id = channel.id or member.user_id = '${context.req.session.qid}' then true
+		      when member.channel_id = channel.id and member.user_id = '${context.req.session.qid}' then true
 		      else false
 	      end is_member
         from channel
         left join member on member.channel_id = channel.id
         group by channel.id,
 	      case 
-		      when member.channel_id = channel.id or member.user_id = '${context.req.session.qid}' then true
+		      when member.channel_id = channel.id and member.user_id = '${context.req.session.qid}' then true
 		      else false
 	      end
         order by member_count desc

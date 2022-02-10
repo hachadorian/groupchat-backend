@@ -21,7 +21,7 @@ export const messageResolver = {
           "message.channel_id"
         )
         .where({ channel_id: args.channelID })
-        .orderBy("created_at", "asc")
+        .orderBy("created_at", "desc")
         .limit(args.limit)
         .offset(args.offset);
     },
