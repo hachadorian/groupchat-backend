@@ -7,6 +7,7 @@ exports.up = function (knex) {
     table.string("bio").nullable();
     table.string("phone").nullable();
     table.string("image").nullable();
+    table.timestamps(true, true);
   });
 };
 

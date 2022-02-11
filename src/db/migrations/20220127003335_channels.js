@@ -3,6 +3,7 @@ exports.up = function (knex) {
     table.string("id").primary().notNullable();
     table.string("name").notNullable();
     table.string("description").notNullable();
+    table.timestamps(true, true);
   });
 };
 
