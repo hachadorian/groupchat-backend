@@ -1,4 +1,4 @@
-export const validate = (options) => {
+export const validateUser = (options) => {
   const numberPattern = /^[0-9]+$/;
 
   if (options.email && !options.email.includes("@")) {
@@ -28,6 +28,34 @@ export const validate = (options) => {
         message: "phone number must contain only digits",
       };
     }
+  }
+
+  return null;
+};
+
+export const validateChannel = (options) => {
+  const channelNamePattern = /^[A-Za-z0-9_@./#&+-\s]{1,35}$/;
+
+  if (options.name.length < 1) {
+    return {
+      __typename: "Errors",
+      message: "channel name cannot be empty",
+    };
+  }
+
+  if (!channelNamePattern.test(options.name)) {
+    return {
+      __typename: "Errors",
+      message:
+        "channel name must be less than 35 characters in length and contain only alphanumeric characters",
+    };
+  }
+
+  if (options.description.length < 1) {
+    return {
+      __typename: "Errors",
+      message: "channel description cannot be empty",
+    };
   }
 
   return null;

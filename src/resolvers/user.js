@@ -1,6 +1,6 @@
 import { dbAccess } from "../utils/dbAccess";
 import bcrypt from "bcrypt";
-import { validate } from "../utils/validate";
+import { validateUser } from "../utils/validate";
 import { v4 as uuid } from "uuid";
 import { uploadFile } from "../utils/awsS3Uploader";
 import { sendEmail } from "../utils/sendEmail";
@@ -17,7 +17,7 @@ export const userResolver = {
   },
   Mutation: {
     register: async (root, args, context) => {
-      const errors = validate({
+      const errors = validateUser({
         email: args.email,
         password: args.password,
       });
@@ -76,7 +76,7 @@ export const userResolver = {
         id: context.req.session.qid,
       });
 
-      const errors = validate({
+      const errors = validateUser({
         email: args.email,
         password: args.password,
         phone: args.phone,
@@ -147,7 +147,7 @@ export const userResolver = {
       return true;
     },
     changePassword: async (root, args, context) => {
-      const errors = validate({
+      const errors = validateUser({
         password: args.password,
       });
 

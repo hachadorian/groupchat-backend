@@ -28,6 +28,13 @@ export const messageResolver = {
   },
   Mutation: {
     createMessage: async (root, args, context) => {
+      if (args.message.length < 1) {
+        return {
+          __typename: "Errors",
+          message: "message cannot be empty",
+        };
+      }
+
       const user = await dbAccess.findOne("user", {
         id: context.req.session.qid,
       });

@@ -1,6 +1,7 @@
 import { dbAccess } from "../utils/dbAccess";
 import { v4 as uuid } from "uuid";
 import { db } from "../db/connection";
+import { validateChannel } from "../utils/validate";
 
 function hydrateChannel(channel, members, messages) {
   return {
@@ -87,6 +88,15 @@ export const channelResolver = {
   },
   Mutation: {
     createChannel: async (root, args, context) => {
+      const errors = validateChannel({
+        name: args.name,
+        description: args.description,
+      });
+
+      if (errors) {
+        return errors;
+      }
+
       const user = await dbAccess.findOne("user", {
         id: context.req.session.qid,
       });
