@@ -1,7 +1,7 @@
 exports.up = function (knex) {
   return knex.schema.createTable("channel", (table) => {
-    table.string("id").primary().notNullable();
-    table.string("name").notNullable();
+    table.string("id").unique().primary().notNullable();
+    table.string("name").unique().notNullable();
     table.string("description").notNullable();
     table.timestamps(true, true);
   });
