@@ -24,7 +24,9 @@ const main = async () => {
   const httpServer = http.createServer(app);
   const pubsub = new PubSub();
   const io = new SocketIOServer(httpServer, {
-    cors: "*",
+    cors: {
+      origin: [process.env.ORIGIN],
+    },
   });
 
   app.use(
