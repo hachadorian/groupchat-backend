@@ -29,11 +29,6 @@ const main = async () => {
     },
   });
 
-  io.configure(function () {
-    io.set("transports", ["xhr-polling"]);
-    io.set("polling duration", 10);
-  });
-
   app.use(
     cors({
       origin: process.env.ORIGIN,
