@@ -109,23 +109,23 @@ const main = async () => {
     path: "/",
   });
 
-  io.on("connection", (socket) => {
-    socket.on("join", async (data) => {
-      await socket.join("room:" + data);
-    });
-    socket.on("typing", (data) => {
-      socket.to("room:" + data.roomId).emit("someoneTyping", {
-        user: data.user,
-        roomId: data.roomId,
-      });
-    });
-    socket.on("leave", (data) => {
-      socket.leave("room:" + data.roomId);
-    });
-    socket.on("not-typing", (data) => {
-      socket.to("room:" + data.roomId).emit("nooneTyping");
-    });
-  });
+  // io.on("connection", (socket) => {
+  //   socket.on("join", async (data) => {
+  //     await socket.join("room:" + data);
+  //   });
+  //   socket.on("typing", (data) => {
+  //     socket.to("room:" + data.roomId).emit("someoneTyping", {
+  //       user: data.user,
+  //       roomId: data.roomId,
+  //     });
+  //   });
+  //   socket.on("leave", (data) => {
+  //     socket.leave("room:" + data.roomId);
+  //   });
+  //   socket.on("not-typing", (data) => {
+  //     socket.to("room:" + data.roomId).emit("nooneTyping");
+  //   });
+  // });
 
   const port = process.env.PORT || 4000;
 
