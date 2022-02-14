@@ -16,19 +16,19 @@ import { graphqlUploadExpress } from "graphql-upload";
 import { SubscriptionServer } from "subscriptions-transport-ws";
 import { execute, subscribe } from "graphql";
 import { PubSub } from "graphql-subscriptions";
-import { Server as SocketIOServer } from "socket.io";
+// import { Server as SocketIOServer } from "socket.io";
 
 const main = async () => {
   dotenv.config();
   const app = express();
   const httpServer = http.createServer(app);
   const pubsub = new PubSub();
-  const io = new SocketIOServer(httpServer, {
-    transports: ["websocket"],
-    cors: {
-      origin: [process.env.ORIGIN],
-    },
-  });
+  // const io = new SocketIOServer(httpServer, {
+  //   transports: ["websocket"],
+  //   cors: {
+  //     origin: [process.env.ORIGIN],
+  //   },
+  // });
 
   app.use(
     cors({
