@@ -36,25 +36,17 @@ export const channelResolver = {
       return hydrateChannel(channel, members, messages.rows);
     },
     getChannels: async (root, args, context) => {
-      const channels =
-        await db.raw(`select channel.id, channel.name, channel.description, count(member.channel_id) as member_count,
-	      case 
-		      when member.channel_id = channel.id and member.user_id = '${
-            context.req.session.qid
-          }' then true
-		      else false
-	      end is_member
-        from channel
-        left join member on member.channel_id = channel.id
-        where channel.name like '%${args.search ? args.search : ""}%'
-        group by channel.id,
-	      case 
-		      when member.channel_id = channel.id and member.user_id = '${
-            context.req.session.qid
-          }' then true
-		      else false
-	      end
-        order by member_count desc
+      const channels = await db.raw(`
+        select 
+	channel.id,
+	channel.name,
+	channel.description,
+	(select count (*) from member where member.channel_id = channel.id) as member_count,
+	case 
+		when exists(select * from member where channel.id = member.channel_id and member.user_id = '${context.req.session.qid}') then true
+		else false
+	end as is_member
+from channel
         `);
       return channels.rows;
     },
